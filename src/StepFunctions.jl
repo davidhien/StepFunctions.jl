@@ -23,6 +23,8 @@ module StepFunctions
             elseif xs[end] == Inf
                 throw(ArgumentError("xs must not contain Inf"))
             else
+                Base.require_one_based_indexing(xs)
+                Base.require_one_based_indexing(ys)
                 new{eltype(xs),eltype(ys)}(xs,ys)
             end
         end
@@ -37,7 +39,7 @@ module StepFunctions
     end
 
     function iterate(iter::StepFunctionIterator{T}) where {T}
-        return (-Inf,map(f->f.ys[1],iter.fcts)), zeros(Int,length(iter.fcts))
+        return (-Inf,map(f->f.ys[1],iter.fcts)), map(f-> firstindex(f.xs)-1, iter.fcts)
     end
 
     function iterate(it::StepFunctionIterator{T}, state) where {T}
@@ -45,7 +47,7 @@ module StepFunctions
         minval, min_ind = findmin(1:n) do i
             succ_i = state[i]+1
             xs = it.fcts[i].xs
-            if succ_i <= length(xs)
+            if succ_i <= lastindex(xs)
                 return xs[succ_i]
             else
                 return Inf

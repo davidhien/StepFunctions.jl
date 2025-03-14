@@ -69,5 +69,24 @@ module StepFunctions
         end
     end
 
+    function (+)(f::StepFunction, g::StepFunction)
+        it = StepFunctionIterator([f,g])
+        xs = promote_type(eltype(f.xs),eltype(g.xs))[]
+        ys = promote_type(eltype(f.ys),eltype(g.ys))[]
+        sizehint!(xs,length(f.xs)+length(g.xs)) # preallocate
+        sizehint!(ys,length(f.xs)+length(g.xs)+1) # preallocate
+
+        for (t,ys_new) in it
+            t == -Inf || push!(xs,t)
+            push!(ys,sum(ys_new))
+        end
+        return StepFunction(xs,ys)
+    end
+
+    # basic operations: +,-,*,/(?)
+    # for one f: max, min, abs, integrate, l_p norms
+    # stats: (pointwise) mean
+
+
     export StepFunction, StepFunctionIterator
 end

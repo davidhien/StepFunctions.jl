@@ -39,7 +39,7 @@ module StepFunctions
     end
 
     function iterate(iter::StepFunctionIterator{T}) where {T}
-        return (-Inf,map(f->f.ys[1],iter.fcts)), map(f-> firstindex(f.xs)-1, iter.fcts)
+        return (-Inf, (f.ys[1] for f in iter.fcts)), map(f-> firstindex(f.xs)-1, iter.fcts)
     end
 
     function iterate(it::StepFunctionIterator{T}, state) where {T}
@@ -57,7 +57,7 @@ module StepFunctions
             return nothing
         end
         state[min_ind] += 1
-        ys_new = map(t-> t[1].ys[t[2]+1], zip(it.fcts,state))
+        ys_new = (t[1].ys[t[2]+1] for t in zip(it.fcts, state))
 
         return (minval,ys_new), state
     end

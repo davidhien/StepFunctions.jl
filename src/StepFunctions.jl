@@ -13,11 +13,12 @@ module StepFunctions
     """
     struct StepFunction{X<:Real,Y}
         xs::Vector{X}
+        y0::Y
         ys::Vector{Y}
 
-        function StepFunction(xs,ys)
-            if length(ys) != length(xs)+1
-                throw(ArgumentError("length(xs)+1 must be equal to length(ys)"))
+        function StepFunction(xs::Vector{X},y0::Y,ys::Vector{Y}) where {X,Y}
+            if length(ys) != length(xs)
+                throw(ArgumentError("For inner constructor: length(xs) must be equal to length(ys)"))
             elseif !issorted(xs)
                 throw(ArgumentError("xs must be sorted"))
             elseif xs[end] == Inf
@@ -25,8 +26,22 @@ module StepFunctions
             else
                 Base.require_one_based_indexing(xs)
                 Base.require_one_based_indexing(ys)
-                new{eltype(xs),eltype(ys)}(xs,ys)
+                new{X,Y}(xs,y0,ys)
             end
+        end
+    end
+
+    function StepFunction(xs::Vector,ys::Vector)
+        if length(ys) != length(xs)+1
+            throw(ArgumentError("length(xs)+1 must be equal to length(ys)"))
+        elseif !issorted(xs)
+            throw(ArgumentError("xs must be sorted"))
+        elseif xs[end] == Inf
+            throw(ArgumentError("xs must not contain Inf"))
+        else
+            Base.require_one_based_indexing(xs)
+            Base.require_one_based_indexing(ys)
+            StepFunction(xs,ys[1],ys[2:end])
         end
     end
 
@@ -39,14 +54,14 @@ module StepFunctions
     end
 
     function iterate(iter::StepFunctionIterator{T}) where {T}
-        return (-Inf, (f.ys[1] for f in iter.fcts)), map(f-> firstindex(f.xs)-1, iter.fcts)
+        return (-Inf, ntuple(i -> iter.fcts[i].y0, length(iter.fcts))), map(f-> firstindex(f.xs)-1, iter.fcts)
     end
 
-    function iterate(it::StepFunctionIterator{T}, state) where {T}
-        n = length(it.fcts)
+    function iterate(iter::StepFunctionIterator{T}, state) where {T}
+        n = length(iter.fcts)
         minval, min_ind = findmin(1:n) do i
             succ_i = state[i]+1
-            xs = it.fcts[i].xs
+            xs = iter.fcts[i].xs
             if succ_i <= lastindex(xs)
                 return xs[succ_i]
             else
@@ -57,7 +72,7 @@ module StepFunctions
             return nothing
         end
         state[min_ind] += 1
-        ys_new = (t[1].ys[t[2]+1] for t in zip(it.fcts, state))
+        ys_new = ntuple(i -> state[i] == 0 ? iter.fcts[i].y0 : iter.fcts[i].ys[state[i]], length(iter.fcts))
 
         return (minval,ys_new), state
     end

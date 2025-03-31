@@ -3,8 +3,21 @@ using Test
 
 @testset "StepFunctions.jl" begin
     @testset "StepFunction constructor" begin
+        # internal constructor
         xs = [1,2,3,4]
         ys = [0,1,2,3,4]
+        f = StepFunction(xs,ys[1],ys[2:end])
+        @test f.xs == xs && f.y0 == ys[1] && f.ys == ys[2:end]
+
+        # convenience constructor
+        xs = [1,2,3,4]
+        ys = [0,1,2,3,4]
+        f = StepFunction(xs,ys)
+        @test f.xs == xs && f.y0 == ys[1] && f.ys == ys[2:end]
+
+        # test empty xs
+        xs = Int[]
+        ys = [0]
         f = StepFunction(xs,ys)
         @test f.xs == xs && f.y0 == ys[1] && f.ys == ys[2:end]
 
@@ -41,40 +54,31 @@ using Test
         @test (t,state) == ((4,(2,3,4,5)), [1,1,1,1])
         @test nothing === iterate(it,state)
     end
+
+    @testset "Unit Tests" begin
+        @testset "to_minimal_stepfct_data" begin
+            # test that the rightmost y value is kept for equal xs
+            xs = [1,1,1,4]
+            ys = [1,2,3,4]
+            xs_new, ys_new = StepFunctions.no_successive_xs(xs, ys)
+            @test xs_new == [1,4]
+            @test ys_new == [3,4]
+
+            # test that the leftmost x-val is kept for equal ys
+            xs = [1,2,3,4]
+            ys = [1,1,1,4]
+            y0 = 0
+            xs_new, ys_new = StepFunctions.no_successive_ys(xs, y0, ys)
+            @test xs_new == [1,4]
+            @test ys_new == [1,4]
+
+            # test that the leftmost x-val is kept for equal ys
+            xs = [1,2,3,4]
+            ys = [1,1,1,4]
+            y0 = 1
+            xs_new, ys_new = StepFunctions.no_successive_ys(xs, y0, ys)
+            @test xs_new == [4]
+            @test ys_new == [4]
+        end
+    end
 end
-
-#=
-
-using StepFunctions
-f = StepFunction([1,2,3,4],[0,1,2,3,4])
-g = StepFunction([1,2,3,4],[0.0,1,2,3,4])
-
-f+g
-@code_warntype f+g
-
-it = StepFunctionIterator([f,g])
-
-a,b = iterate(it)
-@code_warntype ntuple(a[2])
-
-@code_warntype f+g
-
-function test_fun()
-    f = StepFunction([1,2,3,4],[rand(3) for i in 1:4])
-    g = StepFunction([1,2,3,4],[rand(3) for i in 1:5])
-    #it = StepFunctionIterator([f,g])
-
-    return f+g#(f.ys[1] for f in it.fcts)
-end
-@code_warntype test_fun()
-
-using Base
-@which [[1;2;3];[1.0]]
-
-using SparseArrays
-SparseMatrixCSC([1.0 2.0; 3.0 4.0])
-methods(SparseMatrixCSC)
-
-Meta.@lower [1,2,3] ./ [2,3,4]
-Base.broadcasted
-=#

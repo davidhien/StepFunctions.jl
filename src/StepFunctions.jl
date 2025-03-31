@@ -21,11 +21,12 @@ module StepFunctions
                 throw(ArgumentError("For inner constructor: length(xs) must be equal to length(ys)"))
             elseif !issorted(xs)
                 throw(ArgumentError("xs must be sorted"))
-            elseif xs[end] == Inf
+            elseif  !isempty(xs) && xs[end] == Inf
                 throw(ArgumentError("xs must not contain Inf"))
             else
                 Base.require_one_based_indexing(xs)
                 Base.require_one_based_indexing(ys)
+                xs, y0, ys = to_minimal_stepfct_data(xs,y0,ys)
                 new{X,Y}(xs,y0,ys)
             end
         end
@@ -36,7 +37,7 @@ module StepFunctions
             throw(ArgumentError("length(xs)+1 must be equal to length(ys)"))
         elseif !issorted(xs)
             throw(ArgumentError("xs must be sorted"))
-        elseif xs[end] == Inf
+        elseif !isempty(xs) && xs[end] == Inf
             throw(ArgumentError("xs must not contain Inf"))
         else
             Base.require_one_based_indexing(xs)
@@ -96,6 +97,40 @@ module StepFunctions
             push!(ys,sum(ys_new))
         end
         return StepFunction(xs,ys)
+    end
+
+    """
+        function to_minimal_stepfct_data!(xs, y0, ys)
+
+    Given a vector of xs and a vector of ys
+    """
+    function to_minimal_stepfct_data(xs, y0, ys)
+        xs, ys = no_successive_xs(xs, ys)
+        xs, ys = no_successive_ys(xs, y0, ys)
+        return xs, y0, ys
+    end
+
+    function no_successive_xs(xs, ys)
+        # find all xs indices that are not equal to their successor
+        if length(xs) <= 1
+            return xs, ys
+        end
+        ind = [findall( i-> xs[i] != xs[i+1] ,1:length(xs)-1) ; length(xs)]
+        xs = xs[ind]
+        ys = ys[ind]
+        return xs, ys
+    end
+
+    function no_successive_ys(xs, y0, ys)
+        if length(ys) <= 1
+            return xs, ys
+        end
+
+        unequal_to_predecessor = [y0 != ys[1]; ys[2:end] .!= ys[1:end-1]]
+
+        xs = xs[unequal_to_predecessor]
+        ys = ys[unequal_to_predecessor]
+        return xs, ys
     end
 
     # basic operations: +,-,*,/(?)

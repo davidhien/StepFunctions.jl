@@ -37,63 +37,46 @@ using Test
         @test_throws ArgumentError StepFunction(xs,ys)
     end
 
-    @testset "StepFunctionIterator" begin
-        fs = map(i->StepFunction([i],[i,i+1]),1:4)
-        it = StepFunctionIterator(fs)
-        @test length(it) == 5
-
-        state = zeros(Int,4)
-        @test iterate(it) == ((-Inf,(1,2,3,4)), state)
-        t,state = iterate(it,state)
-        @test (t,state) == ((1,(2,2,3,4)), [1,0,0,0])
-        t,state = iterate(it,state)
-        @test (t,state) == ((2,(2,3,3,4)), [1,1,0,0])
-        t,state = iterate(it,state)
-        @test (t,state) == ((3,(2,3,4,4)), [1,1,1,0])
-        t,state = iterate(it,state)
-        @test (t,state) == ((4,(2,3,4,5)), [1,1,1,1])
-        @test nothing === iterate(it,state)
-    end
-
-    @testset "StepFunction addition" begin
-        # simple test
-        f = StepFunction([1,2],[0,1,2])
-        g = StepFunction([1,2],[3,4,5])
-        h = f + g
-        @test h.xs == [1,2]
-        @test h.y0 == 3
-        @test h.ys == [5,7]
+    @testset "Arithmetic Operations" begin
+        @testset "addition" begin
+            # simple test
+            f = StepFunction([1,2],[0,1,2])
+            g = StepFunction([1,2],[3,4,5])
+            h = f + g
+            @test h.xs == [1,2]
+            @test h.y0 == 3
+            @test h.ys == [5,7]
+        
+            # test type promotion
+            f = StepFunction([1,2],[0.0,1,2])
+            g = StepFunction([1,2],[3,4,5])
+            h = f + g
+            @test h.xs == [1,2]
+            @test h.y0 == 3.0
+            @test h.ys == [5.0,7.0]
     
-        # test type promotion
-        f = StepFunction([1,2],[0.0,1,2])
-        g = StepFunction([1,2],[3,4,5])
-        h = f + g
-        @test h.xs == [1,2]
-        @test h.y0 == 3.0
-        @test h.ys == [5.0,7.0]
-
-        # todo: test different lengths, test non-overlapping xs
-
-        @testset "Edge Cases" begin
-            # test empty xs
-            f = StepFunction(Int[],[1])
-            g = StepFunction(Int[],[3])
-            h = f + g
-            @test h.xs == Int[]
-            @test h.y0 == 4
-            @test h.ys == Int[]
-
-            # test empty xs with type promotion
-            f = StepFunction(Int[],[1])
-            g = StepFunction(Float64[],[3])
-            h = f + g
-            @test h.xs == Int[]
-            @test h.y0 == 4
-            @test h.ys == Float64[]
-
-        end
+            # todo: test different lengths, test non-overlapping xs
+    
+            @testset "Edge Cases" begin
+                # test empty xs
+                f = StepFunction(Int[],[1])
+                g = StepFunction(Int[],[3])
+                h = f + g
+                @test h.xs == Int[]
+                @test h.y0 == 4
+                @test h.ys == Int[]
+    
+                # test empty xs with type promotion
+                f = StepFunction(Int[],[1])
+                g = StepFunction(Float64[],[3])
+                h = f + g
+                @test h.xs == Int[]
+                @test h.y0 == 4
+                @test h.ys == Float64[]
+    
+            end
+        end 
     end
-
 
     @testset "Unit Tests" begin
         @testset "to_minimal_stepfct_data" begin
@@ -119,6 +102,23 @@ using Test
             xs_new, ys_new = StepFunctions.no_successive_ys(xs, y0, ys)
             @test xs_new == [4]
             @test ys_new == [4]
+        end
+        @testset "StepFunctionIterator" begin
+            fs = map(i->StepFunction([i],[i,i+1]),1:4)
+            it = StepFunctionIterator(fs)
+            @test length(it) == 5
+    
+            state = zeros(Int,4)
+            @test iterate(it) == ((-Inf,(1,2,3,4)), state)
+            t,state = iterate(it,state)
+            @test (t,state) == ((1,(2,2,3,4)), [1,0,0,0])
+            t,state = iterate(it,state)
+            @test (t,state) == ((2,(2,3,3,4)), [1,1,0,0])
+            t,state = iterate(it,state)
+            @test (t,state) == ((3,(2,3,4,4)), [1,1,1,0])
+            t,state = iterate(it,state)
+            @test (t,state) == ((4,(2,3,4,5)), [1,1,1,1])
+            @test nothing === iterate(it,state)
         end
     end
 end

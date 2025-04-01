@@ -55,7 +55,7 @@ module StepFunctions
     end
 
     function iterate(iter::StepFunctionIterator{T}) where {T}
-        return (-Inf, ntuple(i -> iter.fcts[i].y0, length(iter.fcts))), map(f-> firstindex(f.xs)-1, iter.fcts)
+        return (-Inf, ntuple(i -> iter.fcts[i].y0, length(iter.fcts)) ), map(f-> firstindex(f.xs)-1, iter.fcts)
     end
 
     function iterate(iter::StepFunctionIterator{T}, state) where {T}
@@ -87,6 +87,14 @@ module StepFunctions
 
     function (+)(f::StepFunction, g::StepFunction)
         it = StepFunctionIterator([f,g])
+        xs = [i[1] for i in Iterators.drop(it,1)]
+        ys = [i[2][1]+i[2][2] for i in it]
+
+        return StepFunction(xs,ys)
+    end
+    #=
+    function (+)(f::StepFunction, g::StepFunction)
+        it = StepFunctionIterator([f,g])
         xs = promote_type(eltype(f.xs),eltype(g.xs))[]
         ys = promote_type(eltype(f.ys),eltype(g.ys))[]
         sizehint!(xs,length(f.xs)+length(g.xs)) # preallocate
@@ -97,7 +105,7 @@ module StepFunctions
             push!(ys,sum(ys_new))
         end
         return StepFunction(xs,ys)
-    end
+    end=#
 
     """
         function to_minimal_stepfct_data!(xs, y0, ys)

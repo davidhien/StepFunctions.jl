@@ -55,6 +55,46 @@ using Test
         @test nothing === iterate(it,state)
     end
 
+    @testset "StepFunction addition" begin
+        # simple test
+        f = StepFunction([1,2],[0,1,2])
+        g = StepFunction([1,2],[3,4,5])
+        h = f + g
+        @test h.xs == [1,2]
+        @test h.y0 == 3
+        @test h.ys == [5,7]
+    
+        # test type promotion
+        f = StepFunction([1,2],[0.0,1,2])
+        g = StepFunction([1,2],[3,4,5])
+        h = f + g
+        @test h.xs == [1,2]
+        @test h.y0 == 3.0
+        @test h.ys == [5.0,7.0]
+
+        # todo: test different lengths, test non-overlapping xs
+
+        @testset "Edge Cases" begin
+            # test empty xs
+            f = StepFunction(Int[],[1])
+            g = StepFunction(Int[],[3])
+            h = f + g
+            @test h.xs == Int[]
+            @test h.y0 == 4
+            @test h.ys == Int[]
+
+            # test empty xs with type promotion
+            f = StepFunction(Int[],[1])
+            g = StepFunction(Float64[],[3])
+            h = f + g
+            @test h.xs == Int[]
+            @test h.y0 == 4
+            @test h.ys == Float64[]
+
+        end
+    end
+
+
     @testset "Unit Tests" begin
         @testset "to_minimal_stepfct_data" begin
             # test that the rightmost y value is kept for equal xs

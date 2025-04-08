@@ -91,7 +91,7 @@ module StepFunctions
         ys = [i[2][1]+i[2][2] for i in it]
 
         return StepFunction(xs,ys)
-    end=#
+    end
 
     #=
     function (+)(f::StepFunction, g::StepFunction)

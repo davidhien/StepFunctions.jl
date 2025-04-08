@@ -51,11 +51,11 @@ module StepFunctions
     end
 
     function length(iter::StepFunctionIterator{T}) where T
-        return 1 + sum(f-> length(f.xs),iter.fcts)
+        return sum(f-> length(f.xs),iter.fcts)
     end
 
     function iterate(iter::StepFunctionIterator{T}) where {T}
-        return (-Inf, ntuple(i -> iter.fcts[i].y0, length(iter.fcts)) ), map(f-> firstindex(f.xs)-1, iter.fcts)
+        return iterate(iter,map(f-> firstindex(f.xs)-1, iter.fcts))
     end
 
     function iterate(iter::StepFunctionIterator{T}, state) where {T}
@@ -91,7 +91,8 @@ module StepFunctions
         ys = [i[2][1]+i[2][2] for i in it]
 
         return StepFunction(xs,ys)
-    end
+    end=#
+
     #=
     function (+)(f::StepFunction, g::StepFunction)
         it = StepFunctionIterator([f,g])

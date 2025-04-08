@@ -103,21 +103,31 @@ using Test
             @test xs_new == [4]
             @test ys_new == [4]
         end
-        @testset "StepFunctionIterator" begin
-            fs = map(i->StepFunction([i],[i,i+1]),1:4)
-            it = StepFunctionIterator(fs)
-            @test length(it) == 5
-    
-            state = zeros(Int,4)
-            @test iterate(it) == ((-Inf,(1,2,3,4)), state)
-            t,state = iterate(it,state)
-            @test (t,state) == ((1,(2,2,3,4)), [1,0,0,0])
-            t,state = iterate(it,state)
-            @test (t,state) == ((2,(2,3,3,4)), [1,1,0,0])
-            t,state = iterate(it,state)
-            @test (t,state) == ((3,(2,3,4,4)), [1,1,1,0])
-            t,state = iterate(it,state)
-            @test (t,state) == ((4,(2,3,4,5)), [1,1,1,1])
+        @testset "DomainIterator" begin
+            xs_1 = [1,2,3,4]
+            xs_2 = [0,1.0,2,3,4]
+            it = DomainIterator((xs_1,xs_2))
+            @test length(it) == 9
+
+            x, state = iterate(it)
+            @test (x,state) == (0.0, [0,1])
+            x, state = iterate(it,state)
+            @test (x,state) == (1.0, [1,1])
+            x, state = iterate(it,state)
+            @test (x,state) == (1.0, [1,2])
+            x, state = iterate(it,state)
+            @test (x,state) == (2.0, [2,2])
+            x, state = iterate(it,state)
+            @test (x,state) == (2.0, [2,3])
+            x, state = iterate(it,state)
+            @test (x,state) == (3.0, [3,3])
+            x, state = iterate(it,state)
+            @test (x,state) == (3.0, [3,4])
+            x, state = iterate(it,state)
+            @test (x,state) == (4.0, [4,4])
+            x, state = iterate(it,state)
+            @test (x,state) == (4.0, [4,5])
+            x, state = iterate(it,state)
             @test nothing === iterate(it,state)
         end
     end

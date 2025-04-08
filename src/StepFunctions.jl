@@ -46,6 +46,51 @@ module StepFunctions
         end
     end
 
+    struct SortedDomainIterator{S,T}
+        xs_iter::T
+        function SortedDomainIterator(xs_iter::T) where T
+            S = promote_type(eltype.(xs_iter)...)
+            return new{S,T}(xs_iter)
+        end
+    end
+
+    function length(iter::SortedDomainIterator)
+        return sum(xs-> length(xs),iter.xs_iter)
+    end
+
+    function iterate(iter::SortedDomainIterator)
+        return iterate(iter,collect(map(xs-> firstindex(xs)-1, iter.xs_iter)))
+    end
+
+    function iterate(iter::SortedDomainIterator{S,T}, state) where {S,T}
+        n = length(iter.xs_iter)
+        xs_iter  = iter.xs_iter
+        minval, min_ind = findmin(1:n) do i
+            succ_i = state[i]+1
+            xs = xs_iter[i]
+            if succ_i <= lastindex(xs)
+                return convert(S,xs[succ_i])
+            else
+                return Inf
+            end
+        end
+        if minval == Inf
+            return nothing
+        end
+        state[min_ind] += 1
+        return minval, state
+    end
+
+    function isdone(iter::SortedDomainIterator{T}, state) where {T}
+        return state === nothing || all(zip(iter.fcts,state)) do t
+            f,k = t
+            return length(f.xs) == k
+        end
+    end
+
+
+    
+
     struct StepFunctionIterator{T}
         fcts::T
     end
@@ -147,5 +192,5 @@ module StepFunctions
     # stats: (pointwise) mean
 
 
-    export StepFunction, StepFunctionIterator
+    export StepFunction, StepFunctionIterator, SortedDomainIterator
 end

@@ -129,6 +129,12 @@ using Test
             @test (x,state) == (4.0, [4,5])
             x, state = iterate(it,state)
             @test nothing === iterate(it,state)
+
+            # test empty xs
+            xs = Int[]
+            it = DomainIterator([xs])
+            @test length(it) == 0
+            x, state = iterate(it)
         end
     end
 end

@@ -202,30 +202,13 @@ module StepFunctions
         return StepFunction(xs,ys)
     end
 
-    function (+)(f::StepFunction, g::StepFunction)
-        dom_it = SortedDomainIterator([ f.xs, g.xs ])
+    function (+)(fcts::StepFunction...)
+        dom_it = SortedDomainIterator(map(f-> f.xs, fcts))
         xs = unique(dom_it)
-        it_f = ValueSweepIterator(f, xs)
-        it_g = ValueSweepIterator(g, xs)
-        
-        ys = [x+y for (x,y) in zip(it_f,it_g)]
-        return StepFunction(xs, f.y0+g.y0, ys)
+        ys_its = map(f-> ValueSweepIterator(f, xs), fcts)
+        ys = [+(y...) for y in zip(ys_its...)]
+        return StepFunction(xs, sum(f->f.y0, fcts), ys)
     end
-
-    #=
-    function (+)(f::StepFunction, g::StepFunction)
-        it = StepFunctionIterator([f,g])
-        xs = promote_type(eltype(f.xs),eltype(g.xs))[]
-        ys = promote_type(eltype(f.ys),eltype(g.ys))[]
-        sizehint!(xs,length(f.xs)+length(g.xs)) # preallocate
-        sizehint!(ys,length(f.xs)+length(g.xs)+1) # preallocate
-
-        for (t,ys_new) in it
-            t == -Inf || push!(xs,t)
-            push!(ys,sum(ys_new))
-        end
-        return StepFunction(xs,ys)
-    end=#
 
     """
         function to_minimal_stepfct_data!(xs, y0, ys)

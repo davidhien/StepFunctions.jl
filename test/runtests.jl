@@ -106,7 +106,7 @@ using Test
         @testset "DomainIterator" begin
             xs_1 = [1,2,3,4]
             xs_2 = [0,1.0,2,3,4]
-            it = DomainIterator((xs_1,xs_2))
+            it = SortedDomainIterator((xs_1,xs_2))
             @test length(it) == 9
 
             x, state = iterate(it)
@@ -127,14 +127,15 @@ using Test
             @test (x,state) == (4.0, [4,4])
             x, state = iterate(it,state)
             @test (x,state) == (4.0, [4,5])
-            x, state = iterate(it,state)
-            @test nothing === iterate(it,state)
+            state = iterate(it,state)
+            @test nothing === state
 
             # test empty xs
             xs = Int[]
-            it = DomainIterator([xs])
+            it = SortedDomainIterator([xs])
             @test length(it) == 0
-            x, state = iterate(it)
+            state = iterate(it)
+            @test state === nothing
         end
     end
 end

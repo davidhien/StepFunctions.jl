@@ -1,5 +1,5 @@
 module StepFunctions
-    import Base: iterate, isdone, length
+    import Base: iterate, isdone, length, eltype
     import Base: (+), (-), (*), (/), (^)
 
     """
@@ -86,15 +86,15 @@ module StepFunctions
         return minval, state
     end
 
-    function isdone(iter::SortedDomainIterator{T}, state) where {T}
+    function isdone(iter::SortedDomainIterator{S,T}, state) where {S,T}
         return state === nothing || all(zip(iter.fcts,state)) do t
             f,k = t
             return length(f.xs) == k
         end
     end
 
+    eltype(::Type{SortedDomainIterator{S,T}}) where {S,T} = S
 
-    
 
     struct StepFunctionIterator{T}
         fcts::T

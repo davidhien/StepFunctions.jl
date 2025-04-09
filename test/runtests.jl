@@ -103,7 +103,7 @@ using Test
             @test xs_new == [4]
             @test ys_new == [4]
         end
-        @testset "DomainIterator" begin
+        @testset "SortedDomainIterator" begin
             xs_1 = [1,2,3,4]
             xs_2 = [0,1.0,2,3,4]
             it = SortedDomainIterator((xs_1,xs_2))
@@ -136,6 +136,12 @@ using Test
             @test length(it) == 0
             state = iterate(it)
             @test state === nothing
+        end
+
+        @testset "SortedDomainIterator type stability" begin
+            dom_it = SortedDomainIterator(([1,2], [3,4]))
+            vec = collect(dom_it)
+            @test eltype(vec) == Float64
         end
     end
 end

@@ -46,6 +46,11 @@ module StepFunctions
         end
     end
 
+    """
+        struct SortedDomainIterator{S,T}
+
+    An iterator that iterates over the sorted union of the domains of the step functions.
+    """
     struct SortedDomainIterator{S,T}
         xs_iter::T
         function SortedDomainIterator(xs_iter::T) where T

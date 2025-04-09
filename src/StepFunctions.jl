@@ -194,12 +194,22 @@ module StepFunctions
         end
     end
 
-    function (+)(f::StepFunction, g::StepFunction)
+    function oldplus(f::StepFunction, g::StepFunction)
         it = StepFunctionIterator([f,g])
         xs = [i[1] for i in Iterators.drop(it,1)]
         ys = [i[2][1]+i[2][2] for i in it]
 
         return StepFunction(xs,ys)
+    end
+
+    function (+)(f::StepFunction, g::StepFunction)
+        dom_it = SortedDomainIterator([ f.xs, g.xs ])
+        xs = unique(dom_it)
+        it_f = ValueSweepIterator(f, xs)
+        it_g = ValueSweepIterator(g, xs)
+        
+        ys = [x+y for (x,y) in zip(it_f,it_g)]
+        return StepFunction(xs, f.y0+g.y0, ys)
     end
 
     #=

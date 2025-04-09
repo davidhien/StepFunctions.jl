@@ -141,7 +141,61 @@ using Test
         @testset "SortedDomainIterator type stability" begin
             dom_it = SortedDomainIterator(([1,2], [3,4]))
             vec = collect(dom_it)
+            @test eltype(vec) == Int
+            @test vec == [1,2,3,4]
+        end
+
+        @testset "ValueSweepIterator" begin
+            # simple example
+            f = StepFunction([1,2,3],[0.0,10,20,30])
+            xs=[0,1,2,3]
+            val_it = ValueSweepIterator(f, xs)
+
+            @test length(val_it) == 4
+            @test val_it.f == f
+            @test val_it.xs == xs
+
+            # test iteration
+            y, state = iterate(val_it)
+            @test (y,state[2]) == (0.0, 0)
+            y, state = iterate(val_it,state)
+            @test (y,state[2]) == (10.0, 1)
+            y, state = iterate(val_it,state)
+            @test (y,state[2]) == (20.0, 2)
+            y, state = iterate(val_it,state)
+            @test (y,state[2]) == (30.0, 3)
+            state = iterate(val_it,state)
+            @test state === nothing
+
+
+            # more complicated example
+            f = StepFunction([2,4,6],[0,1,2,3])
+            xs = [1,2,3,6,7]
+            val_it = ValueSweepIterator(f, xs)
+
+            @test length(val_it) == 5
+            @test val_it.f == f
+            @test val_it.xs == xs
+
+            # test iteration
+            y, state = iterate(val_it)
+            @test (y,state[2]) == (0, 0)
+            for t in [(1,1), (1,1), (3,3), (3,3)]
+                y, state = iterate(val_it,state)
+                @test (y,state[2]) == t
+            end
+            @test iterate(val_it,state) === nothing
+
+            # empty xs
+
+        end
+        @testset "ValueSweepIterator type stability" begin
+            f = StepFunction([1,2,3],[0.0,10,20,30])
+            xs = [0,1,2,3]
+            val_it = ValueSweepIterator(f, xs)
+            vec = collect(val_it)
             @test eltype(vec) == Float64
+            @test vec == [0.0, 10.0, 20.0, 30.0]
         end
     end
 end

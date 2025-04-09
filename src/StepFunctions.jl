@@ -95,6 +95,65 @@ module StepFunctions
 
     eltype(::Type{SortedDomainIterator{S,T}}) where {S,T} = S
 
+    """
+        struct ValueSweepIterator{X,Y,XS}
+    
+    Iterates over the values of a step function at the points in a sorted iterator `xs`.  
+    """
+    struct ValueSweepIterator{X,Y,XS}
+        f::StepFunction{X,Y}
+        xs::XS
+        #function ValueSweepIterator(f::StepFunction{X,Y}, xs::XS) where {X,Y,XS}
+        #    return new{X,Y,XS}(f,xs)
+        #end
+    end
+
+    function length(iter::ValueSweepIterator)
+        return length(iter.xs)
+    end
+
+    function iterate(iter::ValueSweepIterator)
+        t = iterate(iter.xs)
+        if t === nothing
+            return nothing
+        end
+        x0,state = t
+
+        i = findlast(x-> x <= x0, iter.f.xs)
+        i = (i === nothing ? 0 : i)
+
+        f = iter.f
+        y = i == 0 ? f.y0 : f.ys[i]
+        
+        return y, (state, i)
+    end
+    
+    function iterate(iter::ValueSweepIterator, state)
+        xs_state, i = state
+
+        t = iterate(iter.xs, xs_state)
+        if t === nothing
+            return nothing
+        end
+        x, xs_state = t
+
+        while i < length(iter.f.xs) && iter.f.xs[i+1] <= x 
+            i += 1
+        end
+
+        f = iter.f
+        y = i == 0 ? f.y0 : f.ys[i]
+
+        return y, (xs_state, i)
+    end
+
+
+    function isdone(iter::ValueSweepIterator, state)
+        return isdone(iter.xs, state[1])
+    end
+
+    eltype(::Type{ValueSweepIterator{X,Y,XS}}) where {X,Y,XS} = Y
+
 
     struct StepFunctionIterator{T}
         fcts::T
@@ -197,5 +256,5 @@ module StepFunctions
     # stats: (pointwise) mean
 
 
-    export StepFunction, StepFunctionIterator, SortedDomainIterator
+    export StepFunction, StepFunctionIterator, SortedDomainIterator, ValueSweepIterator
 end

@@ -1,6 +1,6 @@
 module StepFunctions
     import Base: iterate, isdone, length, eltype
-    import Base: (+), (-), (*), (/), (^)
+    import Base: (+), (-), (*), (/), (//), (^)
 
     """
         struct StepFunction{X<:Real,Y}
@@ -208,6 +208,44 @@ module StepFunctions
         ys_its = map(f-> ValueSweepIterator(f, xs), fcts)
         ys = [+(y...) for y in zip(ys_its...)]
         return StepFunction(xs, sum(f->f.y0, fcts), ys)
+    end
+
+    function (-)(f::StepFunction, g::StepFunction)
+        dom_it = SortedDomainIterator([ f.xs, g.xs ])
+        xs = unique(dom_it)
+        it_f = ValueSweepIterator(f, xs)
+        it_g = ValueSweepIterator(g, xs)
+        
+        ys = [x-y for (x,y) in zip(it_f,it_g)]
+        return StepFunction(xs, f.y0-g.y0, ys)
+    end
+
+    function (*)(fcts::StepFunction...)
+        dom_it = SortedDomainIterator(map(f-> f.xs, fcts))
+        xs = unique(dom_it)
+        ys_its = map(f-> ValueSweepIterator(f, xs), fcts)
+        ys = [*(y...) for y in zip(ys_its...)]
+        return StepFunction(xs, prod(f->f.y0, fcts), ys)
+    end
+
+    function (/)(f::StepFunction, g::StepFunction)
+        dom_it = SortedDomainIterator([ f.xs, g.xs ])
+        xs = unique(dom_it)
+        it_f = ValueSweepIterator(f, xs)
+        it_g = ValueSweepIterator(g, xs)
+        
+        ys = [x/y for (x,y) in zip(it_f,it_g)]
+        return StepFunction(xs, f.y0/g.y0, ys)
+    end
+
+    function (//)(f::StepFunction, g::StepFunction)
+        dom_it = SortedDomainIterator([ f.xs, g.xs ])
+        xs = unique(dom_it)
+        it_f = ValueSweepIterator(f, xs)
+        it_g = ValueSweepIterator(g, xs)
+        
+        ys = [x//y for (x,y) in zip(it_f,it_g)]
+        return StepFunction(xs, f.y0//g.y0, ys)
     end
 
     """

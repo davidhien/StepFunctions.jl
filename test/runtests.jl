@@ -75,7 +75,65 @@ using Test
                 @test h.ys == Float64[]
     
             end
-        end 
+        end
+
+        @testset "subtraction" begin
+            # simple test
+            f = StepFunction([1,2],[0,1,2])
+            g = StepFunction([1,2],[3,5,6])
+            h = f - g
+
+            @test h.xs == [1]
+            @test h.y0 == -3
+            @test h.ys == [-4]
+    
+            # test type promotion
+            f = StepFunction([1,3],[0.0,1,2])
+            g = StepFunction([1,2],[3,4,5])
+            h = f - g
+            f-h
+
+            @test h.xs == [2,3]
+            @test h.y0 == -3.0
+            @test h.ys == [-4.0,-3.0]
+    
+        end
+        @testset "multiplication" begin
+            # simple test
+            f = StepFunction([1,2],[0,1,2])
+            g = StepFunction([1,2],[3,4,5])
+            h = f * g
+            @test h.xs == [1,2]
+            @test h.y0 == 0
+            @test h.ys == [4,10]
+    
+            # test type promotion
+            f = StepFunction([1,2],[0.0,1,2])
+            g = StepFunction([1,2],[3,4,5])
+            h = f * g
+            @test h.xs == [1,2]
+            @test h.y0 == 0.0
+            @test h.ys == [4.0,10.0]
+            @test eltype(h.ys) == eltype(f.ys)    
+        end
+        @testset "division" begin
+            # simple test
+            f = StepFunction([1,2],[0,1,2])
+            g = StepFunction([1,2],[3,4,5])
+            h = f / g
+            @test h.xs == [1,2]
+            @test h.y0 == 0
+            @test h.ys == [0.25,0.4]
+
+            # test rational division
+            f = StepFunction([1,3],[1,2,3])
+            g = StepFunction([1,2],[3,6,5])
+            h = f // g
+
+            @test h.xs == [2,3]
+            @test h.y0 == 1//3
+            @test h.ys == [2//5,3//5]
+        end
     end
 
     @testset "Unit Tests" begin

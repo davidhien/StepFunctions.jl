@@ -282,10 +282,5 @@ module StepFunctions
         return xs, ys
     end
 
-    # basic operations: +,-,*,/(?)
-    # for one f: max, min, abs, integrate, l_p norms
-    # stats: (pointwise) mean
-
-
     export StepFunction, StepFunctionIterator, SortedDomainIterator, ValueSweepIterator
 end

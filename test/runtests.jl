@@ -134,6 +134,16 @@ using Test
             @test h.y0 == 1//3
             @test h.ys == [2//5,3//5]
         end
+
+        @testset "exponentiation" begin
+            # simple test
+            f = StepFunction([1,2],[0,1,2])
+            g = StepFunction([1,2],[3,4,5])
+            h = f ^ g
+            @test h.xs == [1,2]
+            @test h.y0 == 0
+            @test h.ys == [1,32]
+        end
     end
 
     @testset "Unit Tests" begin

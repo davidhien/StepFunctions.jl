@@ -247,6 +247,16 @@ module StepFunctions
         ys = [x//y for (x,y) in zip(it_f,it_g)]
         return StepFunction(xs, f.y0//g.y0, ys)
     end
+    
+    function (^)(f::StepFunction, g::StepFunction)
+        dom_it = SortedDomainIterator([ f.xs, g.xs ])
+        xs = unique(dom_it)
+        it_f = ValueSweepIterator(f, xs)
+        it_g = ValueSweepIterator(g, xs)
+        
+        ys = [x^y for (x,y) in zip(it_f,it_g)]
+        return StepFunction(xs, f.y0^g.y0, ys)
+    end
 
     """
         function to_minimal_stepfct_data!(xs, y0, ys)

@@ -207,17 +207,10 @@ module StepFunctions
         end
     end
 
-    function oldplus(f::StepFunction, g::StepFunction)
-        it = StepFunctionIterator([f,g])
-        xs = [i[1] for i in Iterators.drop(it,1)]
-        ys = [i[2][1]+i[2][2] for i in it]
-
-        return StepFunction(xs,ys)
-    end
-
     ##
     ## arithmetic operations with one step function
     ##
+    
 
 
     ##

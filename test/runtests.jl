@@ -147,6 +147,32 @@ using Test
     end
 
     @testset "Unit Tests" begin
+        @testset "Hash, == and isequal" begin
+            # test hash
+            f = StepFunction([1,2],[0.0,1,2])
+            g = StepFunction([1,2],[0.0,1,2])
+            h = StepFunction([1,2],[-0.0,1,2])
+
+            @test hash(f) == hash(g)
+
+            # test equality
+            @test f == g
+            @test f == h
+
+            # test isequal
+            @test isequal(f,g)
+            @test !isequal(f,h)
+
+            # test not equal
+            h = StepFunction([1,2],[0,1,3])
+            @test f != h
+
+            # test hash with different types
+            f = StepFunction([1.0,2.0],[0.0,1.0,2.0])
+            g = StepFunction([1,2],[0,1,2])
+            @test hash(f) == hash(g)
+        end
+
         @testset "to_minimal_stepfct_data" begin
             # test that the rightmost y value is kept for equal xs
             xs = [1,1,1,4]

@@ -1,4 +1,5 @@
 module StepFunctions
+    import Base: hash, ==, isequal
     import Base: iterate, isdone, length, eltype
     import Base: (+), (-), (*), (/), (//), (^)
 
@@ -44,6 +45,18 @@ module StepFunctions
             Base.require_one_based_indexing(ys)
             StepFunction(xs,ys[1],ys[2:end])
         end
+    end
+
+    function hash( f::StepFunction, h::UInt)
+        return hash(f.xs, hash(f.y0, hash(f.ys, hash(:StepFunctionIterator,h))))
+    end
+
+    function ==(f::StepFunction, g::StepFunction)
+        return f.xs == g.xs && f.y0 == g.y0 && f.ys == g.ys
+    end
+
+    function isequal(f::StepFunction, g::StepFunction)
+        return isequal(f.xs, g.xs) && isequal(f.y0, g.y0) && isequal(f.ys, g.ys)
     end
 
     """
@@ -201,6 +214,15 @@ module StepFunctions
 
         return StepFunction(xs,ys)
     end
+
+    ##
+    ## arithmetic operations with one step function
+    ##
+
+
+    ##
+    ## arithmetic operations with two step functions
+    ##
 
     function (+)(fcts::StepFunction...)
         dom_it = SortedDomainIterator(map(f-> f.xs, fcts))

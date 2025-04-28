@@ -4,7 +4,7 @@ module StepFunctions
     import Base: (+), (-), (*), (/), (//), (^)
 
     """
-        struct StepFunction{X<:Number,Y}
+        struct StepFunction{X<:Real,Y}
     
     A step function is a piecewise constant function.
     It is represented by vectors `xs` and `ys` as follows:
@@ -12,7 +12,7 @@ module StepFunctions
 
     In particular, we must have `length(xs)+1 == length(ys)`. Furthermore, `xs` must be sorted and must not contain `Inf`.
     """
-    struct StepFunction{X<:Number,Y}
+    struct StepFunction{X<:Real,Y}
         xs::Vector{X}
         y0::Y
         ys::Vector{Y}

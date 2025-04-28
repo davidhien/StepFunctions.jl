@@ -59,6 +59,11 @@ module StepFunctions
         return isequal(f.xs, g.xs) && isequal(f.y0, g.y0) && isequal(f.ys, g.ys)
     end
 
+    function (f::StepFunction)(x::Real)
+        i = findlast(t -> t <= x, f.xs)
+        return i === nothing ? f.y0 : f.ys[i]
+    end
+
     """
         struct SortedDomainIterator{S,T}
 

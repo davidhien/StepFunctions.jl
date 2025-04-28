@@ -37,6 +37,31 @@ using Test
         @test_throws ArgumentError StepFunction(xs,ys)
     end
 
+    @testset "evaluation" begin
+        # simple test
+        xs = [1,2,3,4]
+        ys = [0,1,2,3,4]
+        f = StepFunction(xs,ys)
+        @test f(-0.678) == 0
+        @test f(0) == 0
+        @test f(1) == 1
+        @test f(1.5) == 1
+        @test f(2) == 2
+        @test f(2.5) == 2
+        @test f(3) == 3
+        @test f(3.5) == 3
+        @test f(4) == 4
+        @test f(5) == 4
+
+        # test empty xs
+        xs = Int[]
+        ys = [0]
+        f = StepFunction(xs,ys)
+        @test f(0) == 0
+        @test f(1) == 0
+        @test f(2) == 0
+    end
+
     @testset "Arithmetic Operations" begin
         @testset "addition" begin
             # simple test

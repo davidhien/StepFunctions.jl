@@ -62,7 +62,7 @@ using Test
         @test f(2) == 0
     end
 
-    @testset "Arithmetic Operations" begin
+    @testset "arithmetic operations" begin
         @testset "addition" begin
             # simple test
             f = StepFunction([1,2],[0,1,2])
@@ -82,7 +82,7 @@ using Test
     
             # todo: test different lengths, test non-overlapping xs
     
-            @testset "Edge Cases" begin
+            @testset "edge cases" begin
                 # test empty xs
                 f = StepFunction(Int[],[1])
                 g = StepFunction(Int[],[3])
@@ -171,8 +171,8 @@ using Test
         end
     end
 
-    @testset "Unit Tests" begin
-        @testset "Hash, == and isequal" begin
+    @testset "unit tests" begin
+        @testset "hash, == and isequal" begin
             # test hash
             f = StepFunction([1,2],[0.0,1,2])
             g = StepFunction([1,2],[0.0,1,2])

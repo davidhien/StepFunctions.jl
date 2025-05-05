@@ -47,7 +47,7 @@ module StepFunctions
         end
     end
 
-    function hash( f::StepFunction, h::UInt)
+    function hash(f::StepFunction, h::UInt)
         return hash(f.xs, hash(f.y0, hash(f.ys, hash(:StepFunctionIterator,h))))
     end
 

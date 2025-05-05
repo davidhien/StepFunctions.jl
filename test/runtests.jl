@@ -62,7 +62,30 @@ using Test
         @test f(2) == 0
     end
 
-    @testset "arithmetic operations" begin
+    @testset "arithmetic operations: one function" begin
+        @testset "multiplication" begin
+            # simple test
+            f = StepFunction([1,2],[1,1,2])
+            g = StepFunction([1,2],[2,2,4])
+            @test f*2 == g
+            @test 2*f == g
+        end
+        @testset "division" begin
+            # simple test
+            f = StepFunction([1,2],[1,1,2])
+            g = StepFunction([1,2],[1//2,1//2,2//2])
+            @test f/2  == g
+            @test f//2 == g
+        end
+        @testset "exponentiation" begin
+            # simple test
+            f = StepFunction([1,2],[2,2,4])
+            g = StepFunction([1,2],[4,4,16])
+            @test f^2 == g
+        end
+    end
+
+    @testset "arithmetic operations: two functions" begin
         @testset "addition" begin
             # simple test
             f = StepFunction([1,2],[0,1,2])

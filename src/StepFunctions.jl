@@ -215,8 +215,13 @@ module StepFunctions
     ##
     ## arithmetic operations with one step function
     ##
-    
+    (*)(a, f::StepFunction) = StepFunction(f.xs, a*f.y0, a*f.ys)
+    (*)(f::StepFunction, a) = StepFunction(f.xs, f.y0*a, f.ys*a)
 
+    (/)(f::StepFunction, a) = StepFunction(f.xs, f.y0 / a, f.ys/a)
+    (//)(f::StepFunction, a) = StepFunction(f.xs, f.y0//a, f.ys//a)
+
+    (^)(f::StepFunction, a) = StepFunction(f.xs, f.y0^a, f.ys .^a)
 
     ##
     ## arithmetic operations with two step functions

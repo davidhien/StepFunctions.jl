@@ -8,7 +8,7 @@ makedocs(;
     authors="davidhien <david.hien@outlook.de> and contributors",
     sitename="StepFunctions.jl",
     format=Documenter.HTML(;
-        canonical="https://David Hien.github.io/StepFunctions.jl",
+        canonical="https://davidhien.github.io/StepFunctions.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -18,6 +18,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/David Hien/StepFunctions.jl",
+    repo="github.com/davidhien/StepFunctions.jl",
     devbranch="main",
 )

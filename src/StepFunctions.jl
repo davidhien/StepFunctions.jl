@@ -1,16 +1,11 @@
 module StepFunctions
-<<<<<<< HEAD
-
-# Write your package code here.
-
-=======
     import Base: hash, ==, isequal
     import Base: iterate, isdone, length, eltype
     import Base: (+), (-), (*), (/), (//), (^)
 
     """
         struct StepFunction{X<:Real,Y}
-    
+
     A step function is a piecewise constant function.
     It is represented by vectors `xs` and `ys` as follows:
     ``f(t) = \\begin{cases} ys[i+1] & \\text{if } xs[i] \\leq t < xs[i+1] \\\\ ys[1]   & \\text{if } t < xs[1] \\\\ ys[end] & \\text{if } t \\geq xs[end] \\end{cases}``
@@ -120,8 +115,8 @@ module StepFunctions
 
     """
         struct ValueSweepIterator{X,Y,XS}
-    
-    Iterates over the values of a step function at the points in a sorted iterator `xs`.  
+
+    Iterates over the values of a step function at the points in a sorted iterator `xs`.
     """
     struct ValueSweepIterator{X,Y,XS}
         f::StepFunction{X,Y}
@@ -147,10 +142,10 @@ module StepFunctions
 
         f = iter.f
         y = i == 0 ? f.y0 : f.ys[i]
-        
+
         return y, (state, i)
     end
-    
+
     function iterate(iter::ValueSweepIterator, state)
         xs_state, i = state
 
@@ -160,7 +155,7 @@ module StepFunctions
         end
         x, xs_state = t
 
-        while i < length(iter.f.xs) && iter.f.xs[i+1] <= x 
+        while i < length(iter.f.xs) && iter.f.xs[i+1] <= x
             i += 1
         end
 
@@ -245,7 +240,7 @@ module StepFunctions
         xs = unique(dom_it)
         it_f = ValueSweepIterator(f, xs)
         it_g = ValueSweepIterator(g, xs)
-        
+
         ys = [x-y for (x,y) in zip(it_f,it_g)]
         return StepFunction(xs, f.y0-g.y0, ys)
     end
@@ -263,7 +258,7 @@ module StepFunctions
         xs = unique(dom_it)
         it_f = ValueSweepIterator(f, xs)
         it_g = ValueSweepIterator(g, xs)
-        
+
         ys = [x/y for (x,y) in zip(it_f,it_g)]
         return StepFunction(xs, f.y0/g.y0, ys)
     end
@@ -273,17 +268,17 @@ module StepFunctions
         xs = unique(dom_it)
         it_f = ValueSweepIterator(f, xs)
         it_g = ValueSweepIterator(g, xs)
-        
+
         ys = [x//y for (x,y) in zip(it_f,it_g)]
         return StepFunction(xs, f.y0//g.y0, ys)
     end
-    
+
     function (^)(f::StepFunction, g::StepFunction)
         dom_it = SortedDomainIterator([ f.xs, g.xs ])
         xs = unique(dom_it)
         it_f = ValueSweepIterator(f, xs)
         it_g = ValueSweepIterator(g, xs)
-        
+
         ys = [x^y for (x,y) in zip(it_f,it_g)]
         return StepFunction(xs, f.y0^g.y0, ys)
     end
@@ -323,5 +318,4 @@ module StepFunctions
     end
 
     export StepFunction, StepFunctionIterator, SortedDomainIterator, ValueSweepIterator
->>>>>>> dev
 end

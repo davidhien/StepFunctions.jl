@@ -2,9 +2,6 @@ using StepFunctions
 using Test
 
 @testset "StepFunctions.jl" begin
-<<<<<<< HEAD
-    # Write your tests here.
-=======
     @testset "StepFunction constructor" begin
         # internal constructor
         xs = [1,2,3,4]
@@ -97,7 +94,7 @@ using Test
             @test h.xs == [1,2]
             @test h.y0 == 3
             @test h.ys == [5,7]
-        
+
             # test type promotion
             f = StepFunction([1,2],[0.0,1,2])
             g = StepFunction([1,2],[3,4,5])
@@ -105,9 +102,9 @@ using Test
             @test h.xs == [1,2]
             @test h.y0 == 3.0
             @test h.ys == [5.0,7.0]
-    
+
             # todo: test different lengths, test non-overlapping xs
-    
+
             @testset "edge cases" begin
                 # test empty xs
                 f = StepFunction(Int[],[1])
@@ -116,7 +113,7 @@ using Test
                 @test h.xs == Int[]
                 @test h.y0 == 4
                 @test h.ys == Int[]
-    
+
                 # test empty xs with type promotion
                 f = StepFunction(Int[],[1])
                 g = StepFunction(Float64[],[3])
@@ -124,7 +121,7 @@ using Test
                 @test h.xs == Int[]
                 @test h.y0 == 4
                 @test h.ys == Float64[]
-    
+
             end
         end
 
@@ -137,7 +134,7 @@ using Test
             @test h.xs == [1]
             @test h.y0 == -3
             @test h.ys == [-4]
-    
+
             # test type promotion
             f = StepFunction([1,3],[0.0,1,2])
             g = StepFunction([1,2],[3,4,5])
@@ -147,7 +144,7 @@ using Test
             @test h.xs == [2,3]
             @test h.y0 == -3.0
             @test h.ys == [-4.0,-3.0]
-    
+
         end
         @testset "multiplication" begin
             # simple test
@@ -157,7 +154,7 @@ using Test
             @test h.xs == [1,2]
             @test h.y0 == 0
             @test h.ys == [4,10]
-    
+
             # test type promotion
             f = StepFunction([1,2],[0.0,1,2])
             g = StepFunction([1,2],[3,4,5])
@@ -165,7 +162,7 @@ using Test
             @test h.xs == [1,2]
             @test h.y0 == 0.0
             @test h.ys == [4.0,10.0]
-            @test eltype(h.ys) == eltype(f.ys)    
+            @test eltype(h.ys) == eltype(f.ys)
         end
         @testset "division" begin
             # simple test
@@ -343,5 +340,4 @@ using Test
             @test vec == [0.0, 10.0, 20.0, 30.0]
         end
     end
->>>>>>> dev
 end

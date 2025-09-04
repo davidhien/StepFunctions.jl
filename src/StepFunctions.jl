@@ -56,7 +56,7 @@ function StepFunction(xs::Vector, ys::Vector)
 end
 
 function hash(f::StepFunction, h::UInt)
-    return hash(f.xs, hash(f.y0, hash(f.ys, hash(:StepFunctionIterator, h))))
+    return hash(f.xs, hash(f.y0, hash(f.ys, hash(:StepFunction, h))))
 end
 
 function ==(f::StepFunction, g::StepFunction)
@@ -179,46 +179,6 @@ function isdone(iter::ValueSweepIterator, state)
 end
 
 eltype(::Type{ValueSweepIterator{X,Y,XS}}) where {X,Y,XS} = Y
-
-
-struct StepFunctionIterator{T}
-    fcts::T
-end
-
-function length(iter::StepFunctionIterator{T}) where T
-    return sum(f -> length(f.xs), iter.fcts)
-end
-
-function iterate(iter::StepFunctionIterator{T}) where {T}
-    return iterate(iter, map(f -> firstindex(f.xs) - 1, iter.fcts))
-end
-
-function iterate(iter::StepFunctionIterator{T}, state) where {T}
-    n = length(iter.fcts)
-    minval, min_ind = findmin(1:n) do i
-        succ_i = state[i] + 1
-        xs = iter.fcts[i].xs
-        if succ_i <= lastindex(xs)
-            return xs[succ_i]
-        else
-            return Inf
-        end
-    end
-    if minval == Inf
-        return nothing
-    end
-    state[min_ind] += 1
-    ys_new = ntuple(i -> state[i] == 0 ? iter.fcts[i].y0 : iter.fcts[i].ys[state[i]], length(iter.fcts))
-
-    return (minval, ys_new), state
-end
-
-function isdone(iter::StepFunctionIterator{T}, state) where {T}
-    return state === nothing || all(zip(iter.fcts, state)) do t
-        f, k = t
-        return length(f.xs) == k
-    end
-end
 
 ##
 ## arithmetic operations with one step function
@@ -384,7 +344,7 @@ function no_successive_ys(xs, y0, ys)
     return xs, ys
 end
 
-export StepFunction, StepFunctionIterator, SortedDomainIterator, ValueSweepIterator
+export StepFunction, SortedDomainIterator, ValueSweepIterator
 export restrict, lines_data
 
 end

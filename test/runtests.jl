@@ -25,16 +25,19 @@ using Test
         xs = [1, 2, 3, 4]
         ys = [0, 1, 2, 3]
         @test_throws ArgumentError StepFunction(xs, ys)
+        @test_throws ArgumentError StepFunction(xs, ys[1], ys[2:end])
 
         # test unsorted xs
         xs = [1, 3, 2, 4]
         ys = [0, 1, 2, 3, 4]
         @test_throws ArgumentError StepFunction(xs, ys)
+        @test_throws ArgumentError StepFunction(xs, ys[1], ys[2:end])
 
         # test Inf in xs
         xs = [1, 2, 3, Inf]
         ys = [0, 1, 2, 3, 4]
         @test_throws ArgumentError StepFunction(xs, ys)
+        @test_throws ArgumentError StepFunction(xs, ys[1], ys[2:end])
     end
 
     @testset "evaluation" begin
@@ -222,6 +225,22 @@ using Test
         @test g == StepFunction([1, 1.5], [1, 2, 0])
         g = restrict(f, 1.4, 1.6)
         @test g == StepFunction([1.4, 1.6], [0, 2, 0])
+
+        @test_throws ArgumentError restrict(f, 2, 1)
+    end
+
+    @testset "lines_data" begin
+        f = StepFunction([1, 2], [0, 1, 2])
+
+        xs, ys = lines_data(f, 0, 3)
+        @test xs == [0, 1, 1, 2, 2, 3]
+        @test ys == [0, 0, 1, 1, 2, 2]
+
+        xs, ys = lines_data(f, 1.5, 2.5)
+        @test xs == [1.5, 2, 2, 2.5]
+        @test ys == [1, 1, 2, 2]
+
+        @test_throws ArgumentError lines_data(f, 2, 1)
     end
 
     @testset "unit tests" begin
@@ -297,10 +316,13 @@ using Test
             @test (x, state) == (3.0, [3, 4])
             x, state = iterate(it, state)
             @test (x, state) == (4.0, [4, 4])
+            @test Base.isdone(it, state) == false
             x, state = iterate(it, state)
             @test (x, state) == (4.0, [4, 5])
+            @test Base.isdone(it, state) == true
             state = iterate(it, state)
             @test nothing === state
+            @test Base.isdone(it, state) == true
 
             # test empty xs
             xs = Int[]

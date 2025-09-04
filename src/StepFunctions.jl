@@ -113,9 +113,9 @@ function iterate(iter::SortedDomainIterator{S,T}, state) where {S,T}
 end
 
 function isdone(iter::SortedDomainIterator{S,T}, state) where {S,T}
-    return state === nothing || all(zip(iter.fcts, state)) do t
-        f, k = t
-        return length(f.xs) == k
+    return state === nothing || all(zip(iter.xs_iter, state)) do t
+        xs, k = t
+        return length(xs) == k
     end
 end
 

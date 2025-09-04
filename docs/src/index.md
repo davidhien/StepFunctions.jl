@@ -36,7 +36,7 @@ f = StepFunction([0, 2, 3], 1, [0, 3, 2]) #hide
 g = StepFunction([0.4, 0.6], [0, 1, 0]) #hide
 h = f + 2 * g #hide
 
-using Plots 
+using Plots
 
 ylims = (-0.5, 3.5)
 

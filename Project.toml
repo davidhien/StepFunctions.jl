@@ -12,6 +12,7 @@ MakiePltExt = ["Makie"]
 PlotsPltExt = ["RecipesBase"]
 
 [compat]
+RecipesBase = "1"
 julia = "1.7"
 
 [extras]

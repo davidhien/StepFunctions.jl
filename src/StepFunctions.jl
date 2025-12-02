@@ -43,6 +43,9 @@ Here, `length(xs)+1` must be equal to `length(ys)`.
 """
 function StepFunction(xs::Vector, ys::Vector)
     if length(ys) != length(xs) + 1
+        if length(ys) == length(xs) && xs[end] == Inf
+            return StepFunction(xs[1:end-1], ys)
+        end
         throw(ArgumentError("length(xs)+1 must be equal to length(ys)"))
     elseif !issorted(xs)
         throw(ArgumentError("xs must be sorted"))
@@ -53,6 +56,19 @@ function StepFunction(xs::Vector, ys::Vector)
         Base.require_one_based_indexing(ys)
         StepFunction(xs, ys[1], ys[2:end])
     end
+end
+
+function indicator_function(a, b, one=1)
+    if a >= b
+        return StepFunction(Float64[], zero(one), typeof(one)[])
+    elseif a == -Inf && b == Inf
+        return StepFunction(Float64[], one, [one])
+    elseif a == -Inf
+        return StepFunction([b], [one, zero(one)])
+    elseif b == Inf
+        return StepFunction([a], [zero(one), one])
+    end
+    return StepFunction([a, b], zero(one), [one, zero(one)])
 end
 
 function hash(f::StepFunction, h::UInt)
@@ -291,7 +307,7 @@ end
 Returns series ``xs`` and ``ys`` that can be used to plot the step function `f` over the interval `[a,b]`.
 """
 function lines_data(f::StepFunction, a, b)
-    if b<= a
+    if b <= a
         throw(ArgumentError("b must be greater than a"))
     end
 
@@ -303,10 +319,10 @@ function lines_data(f::StepFunction, a, b)
     i2 = findlast(x -> x < b, xs)
 
     i1 = i1 === nothing ? 0 : i1
-    plt_xs = [a;repeat(xs[i1+1:i2],inner=2);b]
+    plt_xs = [a; repeat(xs[i1+1:i2], inner=2); b]
 
-    ys_all = [y0;ys]
-    plt_ys = repeat([ys_all[i1+1:i2];ys[i2]], inner=2)
+    ys_all = [y0; ys]
+    plt_ys = repeat([ys_all[i1+1:i2]; ys[i2]], inner=2)
     return (plt_xs, plt_ys)
 end
 
@@ -345,6 +361,6 @@ function no_successive_ys(xs, y0, ys)
 end
 
 export StepFunction, SortedDomainIterator, ValueSweepIterator
-export restrict, lines_data
+export restrict, lines_data, indicator_function
 
 end

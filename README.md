@@ -6,5 +6,5 @@
 [![Coverage](https://codecov.io/gh/davidhien/StepFunctions.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/davidhien/StepFunctions.jl)
 
 
-StepFunctions provides a simple implementation of right-continuous piecewise constant functions and basic operations on them.
+StepFunctions.jl provides a simple implementation of right-continuous piecewise constant functions and basic operations on them.
 
